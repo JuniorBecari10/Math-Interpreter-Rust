@@ -1,5 +1,7 @@
 mod lexer;
 mod token;
+mod parser;
+mod ast;
 
 use std::io::{self, Write};
 

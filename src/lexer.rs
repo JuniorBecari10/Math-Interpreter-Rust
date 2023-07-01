@@ -1,4 +1,4 @@
-use crate::token::{self, Token};
+use crate::token;
 
 struct Lexer {
   input: Vec<char>,
@@ -43,12 +43,7 @@ impl Lexer {
     self.skip_whitespace();
 
     if self.is_at_end() {
-      return Token {
-        kind: token::TokenKind::End,
-        lexeme: "".into(),
-        content: token::Value::None,
-        pos: self.cursor
-      };
+      return token::end_token(self.cursor);
     }
 
     let kind = match self.char() {

@@ -1,4 +1,4 @@
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Clone)]
 pub enum TokenKind {
   Number,
   Never,
@@ -13,17 +13,26 @@ pub enum TokenKind {
   RParen,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Value {
   Char(char),
   Number(f64),
   None
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
   pub kind: TokenKind,
   pub lexeme: String,
   pub content: Value,
   pub pos: usize,
+}
+
+pub fn end_token(pos: usize) -> Token {
+  Token {
+    kind: TokenKind::End,
+    lexeme: "".into(),
+    content: Value::None,
+    pos: pos
+  }
 }
