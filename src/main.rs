@@ -11,11 +11,17 @@ fn main() {
 
         input("> ", &mut s);
 
-        let res = lexer::lex(s);
-        if res.1 { continue; }
-        let tokens = res.0;
+        let l_res = lexer::lex(s.clone());
+        
+        if l_res.1 { continue }
+        let tokens = l_res.0;
 
-        println!("{:?}", tokens);
+        let p_res = parser::parse(tokens, s.clone());
+
+        if p_res.1 { continue }
+        let exp = p_res.0;
+
+        println!("{:?}", exp);
     }
 }
 
