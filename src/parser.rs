@@ -21,30 +21,10 @@ impl Parser {
     self.cursor >= self.input.len()
   }
 
-  fn peek_is_at_end(&self) -> bool {
-    self.cursor + 1 >= self.input.len()
-  }
-
-  fn prev_is_at_end(&self) -> bool {
-    self.cursor - 1 >= self.input.len()
-  }
-
   fn token(&self) -> token::Token {
     if self.is_at_end() { return token::end_token(self.cursor) }
 
     self.input[self.cursor].clone()
-  }
-
-  fn peek(&self) -> token::Token {
-    if self.peek_is_at_end() { return token::end_token(self.cursor) }
-
-    self.input[self.cursor + 1].clone()
-  }
-
-  fn prev(&self) -> token::Token {
-    if self.prev_is_at_end() { return token::end_token(self.cursor) }
-
-    self.input[self.cursor - 1].clone()
   }
 
   fn token_equal_any(&self, kinds: &[token::TokenKind]) -> bool {
@@ -57,25 +37,16 @@ impl Parser {
     false
   }
 
-  fn peek_equal_any(&self, kinds: &[token::TokenKind]) -> bool {
-    for k in kinds {
-      let kind = k.clone();
-
-      if self.peek().kind == kind { return true }
-    }
-
-    false
-  }
-
   fn exp(&mut self) -> ast::Node {
     let mut exp = self.term();
 
     if self.token_equal_any(&[token::TokenKind::Plus, token::TokenKind::Minus]) {
+      let op = self.token();
       self.advance();
 
       let right = self.term();
 
-      exp = ast::Node::Bin(Box::new(exp), Box::new(right), self.prev().lexeme.chars().nth(0).unwrap());
+      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().nth(0).unwrap());
     }
 
     exp
@@ -84,36 +55,45 @@ impl Parser {
   fn term(&mut self) -> ast::Node {
     let mut exp = self.factor();
 
-    if self.peek_equal_any(&[token::TokenKind::Star, token::TokenKind::Slash]) {
+    if self.token_equal_any(&[token::TokenKind::Star, token::TokenKind::Slash]) {
+      let op = self.token();
       self.advance();
 
       let right = self.factor();
-      exp = ast::Node::Bin(Box::new(exp), Box::new(right), self.prev().lexeme.chars().nth(0).unwrap());
+      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().nth(0).unwrap());
     }
 
     exp
   }
 
   fn factor(&mut self) -> ast::Node {
-    if self.token().kind == token::TokenKind::LParen {
+    let tk = self.token();
+
+    if tk.kind == token::TokenKind::LParen {
       self.advance();
+
+      let exp = self.exp();
 
       if self.token().kind != token::TokenKind::RParen {
         self.report_error("Unclosed parentheses.", self.code.clone(), self.token().pos);
 
         return ast::Node::None;
       }
+
+      self.advance();
+      return exp;
     }
 
     if self.token_equal_any(&[token::TokenKind::Plus, token::TokenKind::Minus]) {
-      let tk = self.token();
       self.advance();
 
       return ast::Node::Unary(Box::new(self.factor()), tk.lexeme.chars().nth(0).unwrap());
     }
 
-    if self.token().kind == token::TokenKind::Number {
-      let n = match self.token().content {
+    if tk.kind == token::TokenKind::Number {
+      self.advance();
+
+      let n = match tk.content {
         token::Value::Number(n) => n,
         _ => 0.0
       };
