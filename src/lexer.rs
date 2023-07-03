@@ -42,6 +42,8 @@ impl Lexer {
   fn next_token(&mut self) -> token::Token {
     self.skip_whitespace();
 
+    let is_number = |c: char| c.is_numeric() || c == '.';
+
     if self.is_at_end() {
       return token::end_token(self.cursor);
     }
@@ -108,10 +110,6 @@ impl Lexer {
     
     println!("^");
   }
-}
-
-fn is_number(c: char) -> bool {
-  c.is_numeric() || c == '.'
 }
 
 pub fn lex(input: String) -> (Vec<token::Token>, bool) {

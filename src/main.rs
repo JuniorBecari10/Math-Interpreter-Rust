@@ -2,6 +2,7 @@ mod lexer;
 mod token;
 mod parser;
 mod ast;
+mod runtime;
 
 use std::io::{self, Write};
 
@@ -11,13 +12,13 @@ fn main() {
 
         input("> ", &mut s);
 
+        if s == "exit" { break }
+
         let l_res = lexer::lex(s.clone());
-        
         if l_res.1 { continue }
         let tokens = l_res.0;
 
         let p_res = parser::parse(tokens, s.clone());
-
         if p_res.1 { continue }
         let exp = p_res.0;
 
