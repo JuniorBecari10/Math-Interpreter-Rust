@@ -22,7 +22,11 @@ fn main() {
         if p_res.1 { continue }
         let exp = p_res.0;
 
-        println!("{:?}", exp);
+        let res = runtime::interpret(exp, s.clone());
+        if res.1 { continue }
+        let value = res.0;
+
+        println!("< {}", value);
     }
 }
 
