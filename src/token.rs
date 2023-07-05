@@ -33,6 +33,6 @@ pub fn end_token(pos: usize) -> Token {
     kind: TokenKind::End,
     lexeme: "".into(),
     content: Value::None,
-    pos: pos
+    pos
   }
 }

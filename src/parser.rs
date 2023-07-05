@@ -10,7 +10,7 @@ struct Parser {
 
 impl Parser {
   fn new(input: Vec<token::Token>, code: String) -> Self {
-    Self { input: input, code: code, cursor: 0, had_error: false }
+    Self { input, code, cursor: 0, had_error: false }
   }
 
   fn advance(&mut self) {
@@ -46,7 +46,7 @@ impl Parser {
 
       let right = self.term();
 
-      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().nth(0).unwrap());
+      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().next().unwrap());
     }
 
     exp
@@ -60,7 +60,7 @@ impl Parser {
       self.advance();
 
       let right = self.factor();
-      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().nth(0).unwrap());
+      exp = ast::Node::Bin(Box::new(exp), Box::new(right), op.lexeme.chars().next().unwrap());
     }
 
     exp
@@ -87,7 +87,7 @@ impl Parser {
     if self.token_equal_any(&[token::TokenKind::Plus, token::TokenKind::Minus]) {
       self.advance();
 
-      return ast::Node::Unary(Box::new(self.factor()), tk.lexeme.chars().nth(0).unwrap());
+      return ast::Node::Unary(Box::new(self.factor()), tk.lexeme.chars().next().unwrap());
     }
 
     if tk.kind == token::TokenKind::Number {

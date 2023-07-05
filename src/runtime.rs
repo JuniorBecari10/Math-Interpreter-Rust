@@ -8,7 +8,7 @@ struct Interpreter {
 
 impl Interpreter {
   fn new(n: ast::Node, code: String) -> Self {
-    Interpreter { node: n, code: code, had_error: false }
+    Interpreter { node: n, code, had_error: false }
   }
 
   fn get_value(&mut self) -> f64 {
@@ -18,18 +18,15 @@ impl Interpreter {
   fn interpret(&mut self, node: ast::Node) -> f64 {
     let v = match node {
       ast::Node::NumberLit(n) => Some(self.number_lit(n)),
-      ast::Node::Bin(a, b, op) => Some(self.bin(a, b, op)),
-      ast::Node::Unary(n, op) => Some(self.unary(n, op)),
+      ast::Node::Bin(a, b, op) => Some(self.bin(*a, *b, op)),
+      ast::Node::Unary(n, op) => Some(self.unary(*n, op)),
       ast::Node::None => {
         self.report_error("Couldn't interpret node.", self.code.clone(), 0);
         None
       },
     };
 
-    match v {
-      Some(v) => v,
-      None => 0.0
-    }
+    v.unwrap_or(0.0)
   }
 
   // ---
@@ -38,9 +35,9 @@ impl Interpreter {
     n
   }
 
-  fn bin(&mut self, a: Box<ast::Node>, b: Box<ast::Node>, op: char) -> f64 {
-    let na = self.interpret(*a);
-    let nb = self.interpret(*b);
+  fn bin(&mut self, a: ast::Node, b: ast::Node, op: char) -> f64 {
+    let na = self.interpret(a);
+    let nb = self.interpret(b);
 
     match op {
       '+' => na + nb,
@@ -63,8 +60,8 @@ impl Interpreter {
     }
   }
 
-  fn unary(&mut self, n: Box<ast::Node>, op: char) -> f64 {
-    let v = self.interpret(*n);
+  fn unary(&mut self, n: ast::Node, op: char) -> f64 {
+    let v = self.interpret(n);
 
     match op {
       '+' => v.abs(),

@@ -20,7 +20,7 @@ impl Lexer {
   }
 
   fn prev_is_at_end(&self) -> bool {
-    self.cursor - 1 >= self.input.len()
+    self.cursor > self.input.len()
   }
 
   fn prev(&self) -> char {
@@ -79,7 +79,7 @@ impl Lexer {
             kind: token::TokenKind::Number,
             lexeme: buf.iter().cloned().collect::<String>(),
             content: token::Value::Number(n),
-            pos: pos,
+            pos,
           };
           
         }
@@ -91,7 +91,7 @@ impl Lexer {
     self.advance();
 
     token::Token {
-      kind: kind,
+      kind,
       lexeme: self.prev().to_string(),
       content: token::Value::Char(self.prev()),
       pos: self.cursor - 1
